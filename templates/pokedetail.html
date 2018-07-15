@@ -1,0 +1,257 @@
+{% load staticfiles %}
+
+<div class="modal-dialog" style="width:1000px; top: 50px;">
+	<div class="modal-content">
+		<div class="modal-header">
+			<div class="col-md-4 btn-group" id="type-change">
+				<button type="button" class="btn btn-default btn-success {% ifequal typeid '1' %}active{% endifequal %}" id="1">Single</button>
+				<button type="button" class="btn btn-default btn-warning {% ifequal typeid '2' %}active{% endifequal %}" id="2">Double</button>
+  				<button type="button" class="btn btn-default btn-info {% ifequal typeid '5' %}active{% endifequal %}" id="5">Special</button>
+				<button type="button" class="btn btn-default btn-danger {% ifequal typeid '6' %}active{% endifequal %}" id="6">Wcs</button>
+			</div>
+			<div class="col-md-3"></div>
+			<div class="col-md-5 btn-group" id="season-change">
+				<button type="button" class="btn btn-default {% ifequal seasonid '311' %}active{% endifequal %}" id="311">Season 11</button>
+				<button type="button" class="btn btn-default {% ifequal seasonid '310' %}active{% endifequal %}" id="310">Season 10</button>
+				<button type="button" class="btn btn-default {% ifequal seasonid '309' %}active{% endifequal %}" id="309">Season 9</button>
+				<button type="button" class="btn btn-default {% ifequal seasonid '308' %}active{% endifequal %}" id="308">Season 8</button>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+			</div>
+		</div>
+		<div id="modal-body" class="modal-body">
+			
+			<div class="row clearfix">
+				<div class="col-md-4 column">
+					
+			 		<div class="btn btn-primary btn-block" style="margin:auto; ">——— <b>{{s}}</b> —— <b>{{type_}}</b> ———</div>
+			 		
+					<div class="panel-group" id="panel-1">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								 <a class="panel-title" data-toggle="collapse" data-parent="#panel-1" href="#panel-element-1"><b>Moves</b></a>
+							</div> 
+							<div id="panel-element-1" class="panel-collapse collapse in">
+								<div class="panel-body">
+									<table class="table-hover table-striped">
+										<tbody>
+											{% for key, v in move_dict.items %}
+											<tr class="tr" name="{{v.model.types.name}},{{v.model.cate.name}},{{v.model.power}},{{v.model.accuracy}},{{v.model.priority}},{{v.model.types.color}},{{v.model.cate.color}}" title="{{v.model.detail}}">
+												<td class="rank">{{key}}</td>
+												<td class="name">{{v.name}}</td>
+												<td class="ratio">{{v.usageRate|floatformat:-1}}%</td>
+											</tr>
+											{% empty %}
+												There is no data to display
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								 <a class="panel-title" data-toggle="collapse" data-parent="#panel-1" href="#panel-element-2"><b>Ability</b></a>
+							</div>
+							<div id="panel-element-2" class="panel-collapse collapse">
+								<div class="panel-body">
+									<table class="table-hover table-striped">
+										<tbody >
+											{% for key, v in ability_dict.items %}
+											<tr class="tr" title="{{v.detail}}" name="-,-,-,-,-,-,-">
+												<td class="rank">{{key}}</td>
+												<td class="name">{{v.name}}</td>
+												<td class="ratio">{{v.usageRate|floatformat:-1}}%</td>
+											</tr>
+											{% empty %}
+												There is no data to display
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								 <a class="panel-title" data-toggle="collapse" data-parent="#panel-1" href="#panel-element-3"><b>Nature</b></a>
+							</div>
+							<div id="panel-element-3" class="panel-collapse collapse">
+								<div class="panel-body">
+									<table class="table-hover table-striped">
+										<tbody>
+											{% for key, v in nature_dict.items %}
+											<tr class="tr" title="{{v.detail}}" name="-,-,-,-,-,-,-">
+												<td class="rank">{{key}}</td>
+												<td class="name">{{v.name}}</td>
+												<td class="ratio">{{v.usageRate|floatformat:-1}}%</td>
+											</tr>
+											{% empty %}
+												There is no data to display
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								 <a class="panel-title" data-toggle="collapse" data-parent="#panel-1" href="#panel-element-4"><b>Held Item</b></a>
+							</div>
+							<div id="panel-element-4" class="panel-collapse collapse">
+								<div class="panel-body">
+									<table class="table-hover table-striped`">
+										<tbody>
+											{% for key, v in item_dict.items %}
+											<tr class="tr" title="{{v.detail}}" name="-,-,-,-,-,-,-">
+												<td class="rank">{{key}}</td>
+												<td class="name">{{v.name}}</td>
+												<td class="ratio">{{v.usageRate|floatformat:-1}}%</td>
+											</tr>
+											{% empty %}
+												There is no data to display
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+						
+				</div>
+
+				<!-- 第二列 -->
+				<div class="col-md-4 column">
+					<div class="thumbnail">
+						<h4><span class="label label-success" style="position: absolute;left:2;top:0;">{{poke_now.ranking}}</span></h4>
+						<img src="/static/poke/img/pgl/{{p_id}}.png">
+					</div>
+					<div class="row">
+						<h3 style="width:200px; margin: auto;" id="{{p_id}},{{typeid}},{{seasonid}}" name="{{poke_now.name}}"><a href="{% url 'poke:index' pokemodel.id %}" target="_blank">{{poke_now.name}}</a>&emsp;{{poke_now.monsno}}</h3>
+					</div>
+					<div class="row" style="width:120px; margin: auto;">
+						<div class="col-md-6">
+							<h3><span class="label label-default" style="background-color: {{type1.color}}">{{type1.name}}</span></h3>
+						</div>
+						{% if type2 %}
+						<div class="col-md-6">
+							<h3><span class="label label-default" style="background-color: {{type2.color}}">{{type2.name}}</span></h3>
+						</div>
+						{% endif %}
+					</div>
+					<hr />
+					<div class="prevnext">
+						<div class="col-md-3"><button type="button" class="btn btn-sm btn-info" id="{{pokeInfo.beforePokemonId}},{{typeid}},{{seasonid}}">Prev</button></div>
+						<div class="col-md-5">
+							<select name="poke" id="pokeselect" onchange="" style="width:100px">
+					      		<!-- <option value="">--精灵--</option> -->
+					      		{% for key, v in allpoke_dict.items %}
+								<option value="{{key}},{{typeid}},{{seasonid}}" name="{{key}}">{{v.name}}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="col-md-1"><button type="button" class="btn btn-sm btn-info" id="{{pokeInfo.nextPokemonId}},{{typeid}},{{seasonid}}">Next</button></div>
+					</div>
+				</div>
+
+				<!-- 第三列 -->
+				<div class="col-md-4 column">
+					<h4 ><b id="name">技能</b></h4>
+					<table class="table-hover table-striped" style="width:250px;">
+						<thead>
+					    	<tr>
+					    		<th>属性</th>
+					    		<th>类型</th>
+					      		<th>威力</th>
+					      		<th>命中</th>
+					      		<th>先制</th>
+					    	</tr>
+					    </thead>
+						<tbody>
+							<tr>
+								<td style="width:50px;"><span id="t1" class="label label-default"></span></td>
+								<td style="width:50px;"><span id="t2" class="label label-default"></span></td>
+								<td style="width:50px;" id="t3"></td>
+								<td style="width:50px;" id="t4"></td>
+								<td style="width:50px;" id="t5"></td>
+							</tr>
+						</tbody>
+					</table>
+					<hr />
+					<p id="detail">说明</p>
+					<hr />
+					<div class="panel-group" id="panel-2">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								 <a class="panel-title" data-toggle="collapse" data-parent="#panel-2" href="#panel-element-5"><b>种族值</b>&emsp;<b>{{total}}</b></a>
+							</div> 
+							<div id="panel-element-5" class="panel-collapse collapse in">
+								<div class="panel-body">
+									<table class="table table-condensed">
+										<tbody>
+											{% for key, value in abili.items %}
+											<tr>
+												<td style="width:60px"><b>{{key|capfirst}}</b></td>
+												<td style="width:50px">{{value}}</td>
+												<td><div style="width:{{value}}px;height: 10px;background: rgb(100,{{value}},0); "></div></td>
+											</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								 <a class="panel-title" data-toggle="collapse" data-parent="#panel-2" href="#panel-element-6"><b>特性</b></a>
+							</div>
+							<div id="panel-element-6" class="panel-collapse collapse">
+								<div class="panel-body">
+									<table class="table table-condensed">
+										<thead>
+										    <tr>
+										      <th>一般特性</th>
+										      <th>说明</th>
+										    </tr>
+										</thead>
+										<tbody>
+										    <tr>
+										      <td style="width:80px">{{pokemodel.ability1.name}}</td>
+										      <td>{{pokemodel.ability1.detail}}</td>
+										    </tr>
+										    {% ifnotequal pokemodel.ability2.name '无' %}
+										    <tr>
+										      <td style="width:80px">{{pokemodel.ability2.name}}</td>
+										      <td>{{pokemodel.ability2.detail}}</td>
+										    </tr>
+										    {% endifnotequal %}
+										</tbody>
+									</table>
+									<table class="table table-condensed">
+										 <thead>
+										    <tr>
+										    	<th>隐藏特性</th>
+										        <th>说明</th>
+										    </tr>
+										</thead>
+										<tbody>
+										    <tr>
+										        <td style="width:80px">{{pokemodel.ability3.name}}</td>
+										        <td>{{pokemodel.ability3.detail}}</td>
+										    </tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+
+
+
+

@@ -1,0 +1,78 @@
+{% extends 'pgl_rank.html' %}
+{% block season %}
+	<div class="tabbable" id="tabs-360981">
+		<ul class="nav nav-tabs">
+			<li>
+				 <a href="#pane-1" data-toggle="tab" value=""><b>Single</b></a>
+			</li>
+			<li class="active">
+				 <a href="#pane-2" data-toggle="tab" value=""><b>Double</b></a>
+			</li>
+			<li>
+				 <a href="#pane-5" data-toggle="tab" value=""><b>Special</b></a>
+			</li>
+			<li>
+				 <a href="#pane-6" data-toggle="tab" value=""><b>Wcs</b></a>
+			</li>
+		</ul>
+		<div class="tab-content">
+
+			<div class="tab-pane" id="pane-1" name="1">
+				{% for each in rank_list1 %}
+				<div class="img-wrap">
+					<div class="img-wrap1"><p><span class="label label-danger">{{each.rank}}</span>&nbsp;&nbsp;<b>{{each.name}}</b></p></div>
+					<div class="img-wrap2">
+						<a id="1" data="{{each.id}}" name="{{each.name}}" href="#type-chart" role="button" data-toggle="modal">
+							<img src="/static/poke/img/pgl/{{each.id}}.png" class="img-thumbnail">
+						</a>
+					</div>
+				</div>
+				{% endfor %}
+				<button type="button" class="btn btn-xs" id="1">加载更多</button>
+			</div>
+
+			<div class="tab-pane active" id="pane-2"  name="2">
+				{% for each in rank_list2 %}
+				<div class="img-wrap">
+					<div class="img-wrap1"><p><span class="label label-danger">{{each.rank}}</span>&nbsp;&nbsp;<b>{{each.name}}</b></p></div>
+					<div class="img-wrap2">
+						<a id="2" data="{{each.id}}" name="{{each.name}}" href="#type-chart" role="button" data-toggle="modal">
+							<img src="/static/poke/img/pgl/{{each.id}}.png" class="img-thumbnail">
+						</a>
+					</div>
+				</div>
+				{% endfor %}
+				<button type="button" class="btn btn-xs" id="2">加载更多</button>
+			</div>
+			
+			<div class="tab-pane" id="pane-5" name="5">
+				{% for each in rank_list5 %}
+				<div class="img-wrap">
+					<div class="img-wrap1"><p><span class="label label-danger">{{each.rank}}</span>&nbsp;&nbsp;<b>{{each.name}}</b></p></div>
+					<div class="img-wrap2">
+						<a id="5" data="{{each.id}}" name="{{each.name}}" href="#type-chart" role="button" data-toggle="modal">
+							<img src="/static/poke/img/pgl/{{each.id}}.png" class="img-thumbnail">
+						</a>
+					</div>
+				</div>
+				{% endfor %}
+				<button type="button" class="btn btn-xs" id="5">加载更多</button>
+			</div>
+
+			<div class="tab-pane" id="pane-6" name="6">
+				{% for each in rank_list6 %}
+				<div class="img-wrap">
+					<div class="img-wrap1"><p><span class="label label-danger">{{each.rank}}</span>&nbsp;&nbsp;<b>{{each.name}}</b></p></div>
+					<div class="img-wrap2">
+						<a id="6" data="{{each.id}}" name="{{each.name}}" href="#type-chart" role="button" data-toggle="modal">
+							<img src="/static/poke/img/pgl/{{each.id}}.png" class="img-thumbnail">
+						</a>
+					</div>
+				</div>
+				{% endfor %}
+				<button type="button" class="btn btn-xs" id="6">加载更多</button>
+			</div>
+
+		</div>
+	</div>
+{% endblock season %}

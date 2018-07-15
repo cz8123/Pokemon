@@ -1,0 +1,204 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>Pokemon-PGL</title>
+
+    <!-- Bootstrap -->
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'poke/css/select2.css' %}" rel="stylesheet">
+    <link href="{% static 'poke/css/bootstrap-slider.css' %}" rel="stylesheet" /> <!-- 滑动条 -->
+    <link href="{% static 'poke/css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'poke/css/my.css' %}" rel="stylesheet"> <!-- 后面覆盖前面 -->
+
+  </head> 
+  <body>
+  	<div class="container">
+
+  		<div class="modal" id="type-chart" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> <!-- 遮罩窗 -->
+          
+		  </div><!-- 遮罩窗 -->
+
+  		<div class="row clearfix"><h4><a href="{% url 'poke:pokepost' %}" target="_blank">首页</a>&emsp;<a href="https://3ds.pokemon-gl.com/" target="_blank">PGL</a>&emsp;<a href="{% url 'poke:movepost' %}" target="_blank">Moves</a></h4></div>
+  		<div class="row clearfix">
+        <div class="col-md-7">
+    			<form id="seasonform" class="bs-example bs-example-form" role="form" action="{% url 'poke:pgl' %}" method="get">
+  	  			<select  onchange="submitForm();" id="season" style="height: 25px" name="season">
+              <option value="311" id='311'>
+                Season 11　07/10/18 09:00 AM - 09/04/18 08:59 AM JST　07/10/18 12:00 AM - 09/03/18 11:59 PM UTC
+              </option>
+              <option value="310" id='310'>
+                Season 10　05/15/18 09:00 AM - 07/10/18 08:59 AM JST　05/15/18 12:00 AM - 07/09/18 11:59 PM UTC
+              </option>
+  	  				<option value="309" id='309'>
+  	  					Season 9　03/13/18 09:00 AM - 05/15/18 08:59 AM JST　03/13/18 12:00 AM - 05/14/18 11:59 PM UTC
+  	  				</option>
+  	  				<option value="308" id='308'>
+  	  					Season 8　01/23/18 09:00 AM - 03/13/18 08:59 AM JST　01/23/18 12:00 AM - 03/12/18 11:59 PM UTC
+  	  				</option>
+  	  			</select>
+  	  		</form>
+        </div>
+        <div class="col-md-3">更新时间：{{updateDate}}</div>
+        <div class="col-md-1"></div>
+        <div class="col-md-1" id="update">
+          {% if is_updated %}
+            <p style="color:red;">有更新！</p>
+          {% endif %}
+        </div>
+  		</div>
+
+  		<hr />
+  		
+		<div class="row clearfix">
+			<div class="col-md-12 column" id='main-season'>
+				{% block season %}
+				{% endblock season %}
+			</div>
+		</div>
+
+	</div><!-- container -->
+
+		  	
+
+	
+
+	<!-- JavaScript 放置在文档最后面可以使页面加载速度更快 -->
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在其他js前边) -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="{% static 'poke/js/ajax.js' %}"></script>
+    <!-- <script src="{% static 'poke/js/bootstrap-slider.min.js' %}"></script> -->
+    <script src="{% static 'poke/js/select2.js' %}"></script>
+    <script type="text/javascript">
+      
+
+      
+
+      $(function(){ 
+          $("#season option[value={{seasonid}}]").attr("selected","selected");
+          $('#season').select2();
+      });
+      
+
+    	function submitForm(){var form = document.getElementById("seasonform");form.submit();};
+
+		   // 对于动态加载页面, on方法要先找到原选择器, 再找到动态添加的选择器
+
+	    $("#type-chart").on("mouseover",".tr", function(){ //鼠标悬停
+	    	$('#name').text($(this).children('td').eq(1).text());
+        $('#t1').text($(this).attr('name').split(',')[0]);
+        $('#t2').text($(this).attr('name').split(',')[1]);
+        $('#t1').css("background-color",$(this).attr('name').split(',')[5]);
+        $('#t2').css("background-color",$(this).attr('name').split(',')[6]);
+        $('#t3').text($(this).attr('name').split(',')[2]);
+        $('#t4').text($(this).attr('name').split(',')[3]);
+        $('#t5').text($(this).attr('name').split(',')[4]);
+        $('#detail').text($(this).attr('title'));
+	    });
+
+      $("#type-chart").on("mouseover",".panel-heading a", function(){ //鼠标悬停手风琴切换
+        $(this).click();
+      });
+
+      $(".tab-content").on("click", "a", function(){ //点击页面上的pokemon，对于js加载的pokemon也有效
+        $.ajax({
+          url: "{% url 'poke:pgl' %}",
+          data: {id: $(this).attr('data'),
+              seasonid: {{seasonid}},
+              typeid: $(this).attr('id'),
+              },
+          type: "POST",
+          success: function(data){
+            $('#type-chart').html(data).find('select').select2();
+          }
+        });
+      });
+
+
+      $("#type-chart").on("click", '#season-change button', function(){ //切换season
+          $.ajax({
+          url: "{% url 'poke:pgl' %}",
+          data: {id: $('h3').attr('id').split(',')[0],
+              seasonid: $(this).attr('id'),
+              typeid: $('h3').attr('id').split(',')[1],
+              },
+          type: "POST",
+          success: function(data){
+            $('#type-chart').html(data).find('select').select2();
+          }
+        });
+      })
+
+      $("#type-chart").on("click", '#type-change button', function(){ //切换对战模式
+          $.ajax({
+          url: "{% url 'poke:pgl' %}",
+          data: {id: $('h3').attr('id').split(',')[0],
+              seasonid: $('h3').attr('id').split(',')[2],
+              typeid: $(this).attr('id'),
+              },
+          type: "POST",
+          success: function(data){
+            $('#type-chart').html(data).find('select').select2();
+          }
+        });
+      })
+
+      
+      $("#type-chart").on("change", "#pokeselect", function(){ //精灵选择框
+        var poke_id = $(this).val().split(',')[0];
+        $.ajax({
+          url: "{% url 'poke:pgl' %}",
+          data: {id: $(this).val().split(',')[0],
+              seasonid: $(this).val().split(',')[2],
+              typeid: $(this).val().split(',')[1],
+              },
+          type: "POST",
+          success: function(data){
+
+            $('#type-chart').html(data).find('select').select2();
+            
+          }
+        });
+      });
+
+      $("#type-chart").on("click", ".prevnext button", function(){ //上一个下一个pokemon
+        $.ajax({
+          url: "{% url 'poke:pgl' %}",
+          data: {id: $(this).attr('id').split(',')[0],
+              seasonid: $(this).attr('id').split(',')[2],
+              typeid: $(this).attr('id').split(',')[1],
+              },
+          type: "POST",
+          success: function(data){
+            $('#type-chart').html(data).find('select').select2();
+          }
+        });
+      });
+
+      $(".tab-content button").click(function(){ //加载更多排名
+        var a = $(this).attr('id');
+        $.ajax({
+          url: "{% url 'poke:pgl' %}",
+          data: {load: true,
+                id: $(this).attr('id'),
+                seasonid: {{seasonid}},
+              },
+          type: "POST",
+          success: function(data){
+            $("#pane-"+a).html(data)
+          }
+        });
+      });
+
+
+    </script>
+
+  </body>
+</html>

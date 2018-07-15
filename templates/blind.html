@@ -1,0 +1,32 @@
+{% load staticfiles %}
+{% if e %}
+	{% if f %}
+	<div class="col-md-6">
+		{% if blind %}
+		<p>盲点</p>
+		{% for t in blind %}
+			<h4><span class="label label-default" style="background-color: {{t.color}}">{{t.name}}</span></h4>
+		{% endfor %}
+		{% else %}
+			<p>无盲点</p>
+		{% endif %}
+	</div>
+	<div class="col-md-6">
+		{% if twice %}
+		<p>2倍</p>
+		{% for t in twice %}
+			<h4><span class="label label-default" style="background-color: {{t.color}}">{{t.name}}</span></h4>
+		{% endfor %}
+		{% else %}
+			<p>无2倍</p>
+		{% endif %}
+	</div>
+	{% else %}
+	<p>请选择非变化技能</p>
+	{% endif %}
+{% else %}
+	<p>请至少选择一个技能</p>
+{% endif %}
+
+
+

@@ -1,0 +1,707 @@
+{% load staticfiles %}
+{% load item_tags %}
+{% load pokemon_tags %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>Pokemon</title>
+
+    <!-- Bootstrap -->
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'poke/css/select2.css' %}" rel="stylesheet">
+    <link href="{% static 'poke/css/bootstrap-slider.css' %}" rel="stylesheet" /> <!-- 滑动条 -->
+    <link href="{% static 'poke/css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'poke/css/my.css' %}" rel="stylesheet"> <!-- 后面覆盖前面 -->
+
+  </head> 
+  <body>
+  	<div class="container">
+		<div class="modal fade" id="type-chart1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> <!-- 遮罩窗 性格 -->
+			<div class="modal-dialog" style="width:900px; ">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<img src="{% static 'poke/img/nature.png' %}" class="img-thumbnail">
+					</div>
+				</div>
+			</div>
+		</div><!-- 遮罩窗 -->
+		<div class="modal fade" id="type-chart" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> <!-- 遮罩窗 属性相克 -->
+			<div class="modal-dialog" style="width:1100px">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<img src="{% static 'poke/img/typeback.png' %}" class="img-thumbnail">
+					</div>
+				</div>
+			</div>
+		</div><!-- 遮罩窗 -->
+		<div class="modal fade" id="type-chart2" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> <!-- 遮罩窗 精灵球-->
+			<div class="modal-dialog" style="width:500px; ">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<img src="{% static 'poke/img/Allballs.png' %}" class="img-thumbnail">
+					</div>
+				</div>
+			</div>
+		</div><!-- 遮罩窗 -->
+
+  		<div class="row"><!-- 第一行 -->
+
+ 				<div class="col-md-2"> <!-- 属性弱点 -->
+ 					<div class="panel panel-default">  
+  						<div class="panel-body">
+  							{% for t in typeatk4 %}
+  							<div class="row">
+								<div class="col-md-5">
+								     <h5><span class="label label-default" style="background-color: {{t.typeatk.color}}">{{t.typeatk.name}}</span></h5>
+								</div>
+								<div class="col-md-7">
+									<i class="fa fa-hand-grab-o fa-lg"></i><i class="fa fa-hand-grab-o fa-lg"></i><i class="fa fa-hand-grab-o fa-lg"></i><i class="fa fa-hand-grab-o fa-lg"></i>
+								</div>
+  							</div>
+  							{% endfor %}
+
+  							{% for t in typeatk2 %}
+  							<div class="row">
+								<div class="col-md-5">
+								     <h5><span class="label label-default" style="background-color: {{t.typeatk.color}}">{{t.typeatk.name}}</span></h5>
+								</div>
+								<div class="col-md-7">
+									<i class="fa fa-hand-grab-o fa-lg"></i><i class="fa fa-hand-grab-o fa-lg"></i>
+								</div>
+  							</div>
+  							{% endfor %}
+
+  							{% for t in typeatk0 %}
+  							<div class="row">
+								<div class="col-md-5">
+								     <h5><span class="label label-default" style="background-color: {{t.typeatk.color}}">{{t.typeatk.name}}</span></h5>
+								</div>
+								<div class="col-md-7">
+									<i class="fa fa-times-circle fa-lg"></i>
+								</div>
+  							</div>
+  							{% endfor %}
+  							<hr />
+  							<!-- 左下按按钮组 -->
+  							<div class="btn-group btn-group-xs">
+	  							<a href="#type-chart" role="button" class="btn" data-toggle="modal"><button type="button" class="btn btn-default btn-xs btn-primary">属性表</button></a>
+	  							<a href="#type-chart1" role="button" class="btn" data-toggle="modal"><button type="button" class="btn btn-default btn-xs btn-info">性格</button></a>
+	  							<a href="#type-chart2" role="button" class="btn" data-toggle="modal"><button type="button" class="btn btn-default btn-xs btn-warning">精灵球</button></a>
+	  							<a href="{% url 'poke:movepost' %}" role="button" class="btn" target="_blank"><button id="jineng" type="button" class="btn btn-default btn-xs btn-danger">技能</button></a>
+	  						</div>
+  						</div>
+  					</div>
+ 				</div>
+
+ 				<div class="col-md-3"> <!-- 精灵图片 -->
+ 					<div class="panel panel-default">  
+  						<div class="panel-body">
+  							<div class="row">
+  								<div class="thumbnail">
+  									<img src="/static/poke/img/wiki/{{poke_now.pic}}.png" class="">
+  								</div>
+  							</div>
+  							<div class="row clearfix">
+  								<!-- 精灵第一、第二属性 -->
+  								<div class="col-md-2 column">
+  									<h4><span class="label label-default" style="background-color: {{poke_now.type1.color}}">{{poke_now.type1.name}}</span></h4>
+  								</div>
+  								{% ifnotequal poke_now.type2.id 19  %}
+  								<div class="col-md-2 column">
+  									<h4><span class="label label-default" style="background-color: {{poke_now.type2.color}}">{{poke_now.type2.name}}</span></h4>
+  								</div>
+								{% endifnotequal %}
+
+								<!-- 精灵选择框 -->
+  								<div class="col-md-7 column">
+  									<div style="padding: 5px 30px;">
+										<form id="pokeform" class="bs-example bs-example-form" role="form" action="{% url 'poke:pokepost' poke_now.id %}" method="post">
+											{% csrf_token %}
+											<select onchange="submitForm();" name="pokepost" id="pokeselect" style="width:110px">
+												{% get_pokemons as poke %}
+												{% for p in poke %}
+												<option value="{{p.id}}">{{p.name}}</option>
+												{% endfor %}
+											</select>
+										</form>
+									</div>
+  								</div>
+  							</div>
+  							<div class='row'><!-- 上一个、下一个精灵 -->
+  								<div class='col-md-6'><a href="{% url 'poke:index' poke_prev.id %}" role="button" class="btn"><<<img src="/static/poke/img/icon/{{poke_prev.pic}}.png" width="40"></a></div>
+
+  								<div class='col-md-6'><a href="{% url 'poke:index' poke_next.id %}" role="button" class="btn"><img src="/static/poke/img/icon/{{poke_next.pic}}.png" width="40">>></a></div>
+  							</div>
+
+  						</div>
+  					</div>
+ 				</div>
+
+ 				<div class="col-md-7"><!-- 精灵名字、特性、道具 -->
+					<div class="row">
+						<div class="col-md-9">
+							<h3>#&nbsp{{poke_now.num}}&emsp;&emsp;<a href="https://wiki.52poke.com/wiki/{{poke_now.name}}" target="blank">{{poke_now.name}}</a>&emsp;{{poke_now.name_en}}&emsp;<a href="{% url 'poke:pgl' %}" target="_blank">pgl-rank</a>
+							</h3>
+						</div>
+					</div>
+					<div class="row">
+						<table class="table table-condensed">
+					  		<thead>
+						    <tr>
+						      <th>一般特性</th>
+						      <th>说明</th>
+						      <th>神百</th>
+						    </tr>
+						  	</thead>
+						  	<tbody>
+					    		<tr>
+							      <td style="width:120px">{{poke_now.ability1.name}}</td>
+							      <td style="width:480px">{{poke_now.ability1.detail}}</td>
+							      <td><a href="https://wiki.52poke.com/wiki/{{poke_now.ability1.name}}" target="_blank">{{poke_now.ability1.name}}</a></td>
+							    </tr>
+							    {% ifnotequal poke_now.ability2.name '无' %}
+								<tr>
+							      <td style="width:120px">{{poke_now.ability2.name}}</td>
+							      <td style="width:480px">{{poke_now.ability2.detail}}</td>
+							      <td><a href="https://wiki.52poke.com/wiki/{{poke_now.ability2.name}}" target="_blank">{{poke_now.ability2.name}}</a></td>
+							    </tr>
+							    {% endifnotequal %}
+					  		</tbody>
+						</table>
+						<table class="table table-condensed">
+					  		<thead>
+							    <tr>
+							      <th>隐藏特性</th>
+							      <th>说明</th>
+							      <th>神百</th>
+							    </tr>
+					  		</thead>
+						  	<tbody>
+							    <tr>
+							      <td style="width:120px">{{poke_now.ability3.name}}</td>
+							      <td style="width:480px">{{poke_now.ability3.detail}}</td>
+							      {% ifnotequal poke_now.ability3.name '无' %}
+							      <td><a href="https://wiki.52poke.com/wiki/{{poke_now.ability3.name}}" target="_blank">{{poke_now.ability3.name}}</a></td>
+							      {% endifnotequal %}
+							    </tr>
+						  	</tbody>
+						</table>
+						<table class="table table-condensed">
+						  <thead>
+						    <tr>
+						      <th>战斗道具</th>
+						      <th>说明</th>
+						      <th></th>
+						    </tr>
+						  </thead>
+						  <tbody>
+						    <tr>
+						      <td style="width:120px">
+						      	<select id="all_items" onchange="" style="width:100px">
+						      		<option value="">--items--</option>
+									{% get_items as items %}
+						      		{% for item in items %}
+									<option value="{{item.detail}},{{item.itemid}}">{{item.name}}</option>
+									{% endfor %}
+								</select>
+						      </td>
+						      <td id="item" style="width:500px"></td>
+						      <td><img src="" id="item_pic" style="width:30px;"></td>
+						    </tr>
+						  </tbody>
+						</table>
+						
+				</div>
+  			</div>
+ 		</div><!-- 第一行 -->
+
+		<div class="row clearfix"><!-- 手风琴切换 -->
+			<div class="panel-group" id="panel-1">
+
+				<div class="panel panel-default"><!-- 个体值计算 -->
+					<div class="panel-heading">
+						 <a class="panel-title" data-toggle="collapse" data-parent="#panel-1" href="#panel-element-2">能力值计算&emsp;<b>{{total}}</b></a>&emsp;
+						 {% if poke_addition %}
+						 <div class="btn-group" id="addition">
+							{% for p in poke_add %}
+								{% if p.name1 %}
+								<a role="button" class="btn btn-primary btn-sm" href="{% url 'poke:index' p.id %}">{{p.name1}}</a>
+								{% else %}
+								<a role="button" class="btn btn-primary btn-sm" href="{% url 'poke:index' p.id %}">{{p.name}}</a>
+								{% endif %}
+							{% endfor %}
+						</div>
+						{% endif %}
+					</div>
+					<div id="panel-element-2" class="panel-collapse collapse in">
+						<div class="panel-body">
+							<div class="col-md-11">
+							<div class=row> <!-- Hp 生命 -->
+				  				<div class="col-md-1" value="{{poke_now.hp}}" id="hp"><b>Hp</b>&nbsp<b>{{poke_now.hp}}</b></div>
+								<div class="col-md-3"><div id="hp_RGB" style=""></div></div>
+								<div class="col-md-7">
+									<div class="col-md-1"><b id="hpStat"></b></div>
+									<div class="col-md-5">
+										<input id="hpex" data-slider-id='hpex1' type="range" data-slider-min="0" data-slider-max="252" data-slider-step="1" data-slider-value="0" data-slider-tooltip="hide"/>
+									</div>
+									<div class="col-md-2">
+		            					<input id="hpbase" type="text" class="form-control" placeholder="0-252" value="" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-2">
+		        						<input id="hpIV" type="text" class="form-control" placeholder="0-31" value="31" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-2">
+		        						<input id="Lv" type="text" class="form-control" placeholder="1-50" value="50" autoComplete='off'>
+		        					</div>
+		        				</div>
+							</div>
+
+							<div class=row> <!-- Atk 物攻 -->
+				  				<div class="col-md-1" value="{{poke_now.atk}}"><b>Atk</b>&nbsp<b id="atk">{{poke_now.atk}}</b></div>
+								<div class="col-md-3"><div id="atk_RGB" style=""></div></div>
+								<div class="col-md-7">
+									<div class="col-md-1"><b id="atkStat"></b></div>
+									<div class="col-md-5">
+										<input id="atkex" data-slider-id='atkex1' type="range" data-slider-min="0" data-slider-max="252" data-slider-step="1" data-slider-value="0" data-slider-tooltip="hide"/>
+									</div>
+									<div class="col-md-2">
+		            					<input id="atkbase" type="text" class="form-control" placeholder="0-252" value="" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-2">
+		        						<input id="atkIV" type="text" class="form-control" placeholder="0-31" value="31" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature-" name="nature-" id="atk-" value="1"> -
+											</label>
+										</div>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature_add" name="nature_add" id="atk_add" value="1"> +
+											</label>
+										</div>
+		        					</div>
+		        					
+		        				</div>
+							</div>
+
+							<div class=row> <!-- Defen 物防-->
+				  				<div class="col-md-1" value="{{poke_now.defen}}"><b>Defen</b>&nbsp<b id="defen">{{poke_now.defen}}</b></div>
+								<div class="col-md-3"><div id="defen_RGB" style=""></div></div>
+								<div class="col-md-7">
+									<div class="col-md-1"><b id="defenStat"></b></div>
+									<div class="col-md-5">
+										<input id="defenex" data-slider-id='defenex1' type="range" data-slider-min="0" data-slider-max="252" data-slider-step="1" data-slider-value="0" data-slider-tooltip="hide"/>
+									</div>
+									<div class="col-md-2">
+		            					<input id="defenbase" type="text" class="form-control" placeholder="0-252" value="" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-2">
+		        						<input id="defenIV" type="text" class="form-control" placeholder="0-31" value="31" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature-" name="nature-" id="defen-" value="1"> -
+											</label>
+										</div>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature_add" name="nature_add" id="defen_add" value="1"> +
+											</label>
+										</div>
+		        					</div>
+		        				</div>
+							</div>
+							<div class=row> <!-- Satk 特攻 -->
+				  				<div class="col-md-1" value="{{poke_now.satk}}"><b>Satk</b>&nbsp<b id="satk">{{poke_now.satk}}</b></div>
+								<div class="col-md-3"><div id="satk_RGB" style=""></div></div>
+								<div class="col-md-7">
+									<div class="col-md-1"><b id="satkStat"></b></div>
+									<div class="col-md-5">
+										<input id="satkex" data-slider-id='satkex1' type="range" data-slider-min="0" data-slider-max="252" data-slider-step="1" data-slider-value="0" data-slider-tooltip="hide"/>
+									</div>
+									<div class="col-md-2">
+		            					<input id="satkbase" type="text" class="form-control" placeholder="0-252" value="" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-2">
+		        						<input id="satkIV" type="text" class="form-control" placeholder="0-31" value="31" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature-" name="nature-" id="satk-" value="1"> -
+											</label>
+										</div>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature_add" name="nature_add" id="satk_add" value="1"> +
+											</label>
+										</div>
+		        					</div>
+		        				</div>
+							</div>
+							<div class=row> <!-- Sdef 特防 -->
+				  				<div class="col-md-1" value="{{poke_now.sdef}}"><b>Sdef</b>&nbsp<b id="sdef">{{poke_now.sdef}}</b></div>
+								<div class="col-md-3"><div id="sdef_RGB" style=""></div></div>
+								<div class="col-md-7">
+									<div class="col-md-1"><b id="sdefStat"></b></div>
+									<div class="col-md-5">
+										<input id="sdefex" data-slider-id='sdefex1' type="range" data-slider-min="0" data-slider-max="252" data-slider-step="1" data-slider-value="0" data-slider-tooltip="hide"/>
+									</div>
+									<div class="col-md-2">
+		            					<input id="sdefbase" type="text" class="form-control" placeholder="0-252" value="" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-2">
+		        						<input id="sdefIV" type="text" class="form-control" placeholder="0-31" value="31" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature-" name="nature-" id="sdef-" value="1"> -
+											</label>
+										</div>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature_add" name="nature_add" id="sdef_add" value="1"> +
+											</label>
+										</div>
+		        					</div>
+		        				</div>
+							</div>
+							<div class=row> <!-- Sp 速度 -->
+				  				<div class="col-md-1" value="{{poke_now.sp}}"><b>Sp</b>&nbsp<b id="sp">{{poke_now.sp}}</b></div>
+								<div class="col-md-3"><div id="sp_RGB" style=""></div></div>
+								<div class="col-md-7">
+									<div class="col-md-1"><b id="spStat"></b></div>
+									<div class="col-md-5">
+										<input id="spex" data-slider-id='spex1' type="range" data-slider-min="0" data-slider-max="252" data-slider-step="1" data-slider-value="0" data-slider-tooltip="hide"/>
+									</div>
+									<div class="col-md-2">
+		            					<input id="spbase" type="text" class="form-control" placeholder="0-252" value="" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-2">
+		        						<input id="spIV" type="text" class="form-control" placeholder="0-31" value="31" autoComplete='off'>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature-" name="nature-" id="sp-" value="1"> -
+											</label>
+										</div>
+		        					</div>
+		        					<div class="col-md-1">
+		        						<div class="radio">
+											<label>
+												<input type="radio" class="nature_add" name="nature_add" id="sp_add" value="1"> +
+											</label>
+										</div>
+		        					</div>
+		        				</div>
+							</div>
+							</div>
+							<div class="col-md-1">
+								<div class='row'><img src="/static/poke/img/front/{{poke_now.pic}}.gif"></div>
+								<!-- <hr /> -->
+								<div class='row'><img src="/static/poke/img/front-shiny/{{poke_now.pic}}.gif"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</div><!-- 手风琴切换 -->
+
+	</div><!-- container -->
+
+		  	
+
+	
+
+	<!-- JavaScript 放置在文档最后面可以使页面加载速度更快 -->
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在其他js前边) -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- <script src="{% static 'poke/js/ajax.js' %}"></script> -->
+    <script src="{% static 'poke/js/bootstrap-slider.min.js' %}"></script> <!-- 滑动条 -->
+    <script src="{% static 'poke/js/select2.js' %}"></script>
+    <script type="text/javascript">
+
+		// 加载select2
+    		$(function(){
+	    		$("#all_items").select2().change(function(){
+    				$("#item").text($(this).val().split(',')[0]);
+    				$("#item_pic").attr("src", "/static/poke/img/item/"+$(this).val().split(',')[1]+".png")
+    			});
+	        	$("#pokeselect option[value='{{poke_now.id}}']").attr("selected","selected");
+	        	$("#pokeselect").select2();
+	      	});
+
+
+    	// 精灵选择框
+    		function submitForm(){var form = document.getElementById("pokeform");form.submit();};
+
+    	// hp能力值计算, 考虑脱壳忍者单独计算
+    		function hpa(){
+    			var poke_id = {{poke_now.id}}
+    			if (poke_id == 335){
+    				$("#hpStat").text({{poke_now.hp}});
+					$('#hp_RGB').css('width', {{poke_now.hp}} + 'px');
+					$('#hp_RGB').css('background', 'rgb('+ {{poke_now.hp}} + ',' + 0 + ',' + 0 + ')');
+    			}
+    			else{
+					$("#hpStat").text(parseInt(({{poke_now.hp}}*2+31)/2)+60);
+					$('#hp_RGB').css('width', (parseInt(({{poke_now.hp}}*2+31)/2)+60) + 'px');
+					$('#hp_RGB').css('background', 'rgb('+ {{poke_now.hp}} + ',' + 0 + ',' + 0 + ')');
+
+					$('#hpbase').on('input propertychange', function() {r.setValue($(this).val());
+						$('#hpStat').text(parseInt(({{poke_now.hp}}*2+parseInt(r.getValue()/4)+($('#hpIV').val()-0))/2)+60);
+						$('#hp_RGB').css('background', 'rgb('+ {{poke_now.hp}} + ',' + r.getValue()/2 + ',' + 0 + ')');
+		    			$('#hp_RGB').css('width', (parseInt(({{poke_now.hp}}*2+parseInt(r.getValue()/4)+($('#hpIV').val()-0))/2)+60) + 'px');
+					});
+
+					$('#hpIV').on('input propertychange', function() { if ($(this).val()>31){$('#hpStat').text(parseInt(({{poke_now.hp}}*2+parseInt(r.getValue()/4)+31)/2)+60)}else{$('#hpStat').text(parseInt(({{poke_now.hp}}*2+parseInt(r.getValue()/4)+($('#hpIV').val()-0))/2)+60)};
+		    			$('#hp_RGB').css('width', (parseInt(({{poke_now.hp}}*2+parseInt(r.getValue()/4)+($('#hpIV').val()-0))/2)+60) + 'px');
+					});
+
+					var hp_RGBChange = function() {$('#hp_RGB').css('background', 'rgb('+ {{poke_now.hp}} + ',' + r.getValue()/2 + ',' + 0 + ')')
+		    								$('#hp_RGB').css('width', (parseInt(({{poke_now.hp}}*2+parseInt(r.getValue()/4)+($('#hpIV').val()-0))/2)+60) + 'px');
+		    								$('#hpbase').val(r.getValue());
+		    								if ($('#hpIV').val()>31){$('#hpStat').text(parseInt(({{poke_now.hp}}*2+parseInt(r.getValue()/4)+31)/2)+60)}else{$('#hpStat').text(parseInt(({{poke_now.hp}}*2+parseInt(r.getValue()/4)+($('#hpIV').val()-0))/2)+60)}; };
+					var r = $('#hpex').slider().on('slide', hp_RGBChange).data('slider');
+    			};
+    		};
+    		window.onload=hpa();
+    		
+
+		// atk能力值计算
+			$("#atkStat").text(parseInt(({{poke_now.atk}}*2+31)/2)+5);
+			$('#atk_RGB').css('width', (parseInt(({{poke_now.atk}}*2+31)/2)+5) + 'px');
+			$('#atk_RGB').css('background', 'rgb('+ {{poke_now.atk}} + ',' + 0 + ',' + 0 + ')');
+
+			$('#atkbase').on('input propertychange', function() {atk.setValue($(this).val());
+				$('#atkStat').text(parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add));
+				$('#atk_RGB').css('background', 'rgb('+ {{poke_now.atk}} + ',' + atk.getValue()/2 + ',' + 0 + ')');
+    			$('#atk_RGB').css('width', (parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add)) + 'px');
+			});
+
+			$('#atkIV').on('input propertychange', function() { if ($(this).val()>31){$('#atkStat').text(parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add))}else{$('#atkStat').text(parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add))};
+    			$('#atk_RGB').css('width', (parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add)) + 'px');
+			});
+
+			var atk_RGBChange = function() {$('#atk_RGB').css('background', 'rgb('+ {{poke_now.atk}} + ',' + atk.getValue()/2 + ',' + 0 + ')')
+    								$('#atk_RGB').css('width', ( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add)) + 'px');
+    								$('#atkbase').val(atk.getValue());
+    								if ($('#atkIV').val()>31){$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+31)/2)+5)*atk_sub*atk_add))}else{$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) )}; };
+			var atk = $('#atkex').slider().on('slide', atk_RGBChange).data('slider');
+
+		// defen能力值计算
+			$("#defenStat").text(parseInt(({{poke_now.defen}}*2+31)/2)+5);
+			$('#defen_RGB').css('width', (parseInt(({{poke_now.defen}}*2+31)/2)+5) + 'px');
+			$('#defen_RGB').css('background', 'rgb('+ {{poke_now.defen}} + ',' + 0 + ',' + 0 + ')');
+
+			$('#defenbase').on('input propertychange', function() {defen.setValue($(this).val());
+				$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+				$('#defen_RGB').css('background', 'rgb('+ {{poke_now.defen}} + ',' + defen.getValue()/2 + ',' + 0 + ')');
+    			$('#defen_RGB').css('width', ( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) ) + 'px');
+			});
+
+			$('#defenIV').on('input propertychange', function() { if ($(this).val()>31){$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+31)/2)+5)*def_sub*def_add) )}else{$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) )};
+    			$('#defen_RGB').css('width', ( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) ) + 'px');
+			});
+
+			var defen_RGBChange = function() {$('#defen_RGB').css('background', 'rgb('+ {{poke_now.defen}} + ',' + defen.getValue()/2 + ',' + 0 + ')')
+    								$('#defen_RGB').css('width', ( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) ) + 'px');
+    								$('#defenbase').val(defen.getValue());
+    								if ($('#defenIV').val()>31){$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+31)/2)+5)*def_sub*def_add) )}else{$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) )}; };
+			var defen = $('#defenex').slider().on('slide', defen_RGBChange).data('slider');
+
+		// satk能力值计算
+			$("#satkStat").text(parseInt(({{poke_now.satk}}*2+31)/2)+5);
+			$('#satk_RGB').css('width', (parseInt(({{poke_now.satk}}*2+31)/2)+5) + 'px');
+			$('#satk_RGB').css('background', 'rgb('+ {{poke_now.satk}} + ',' + 0 + ',' + 0 + ')');
+
+			$('#satkbase').on('input propertychange', function() {satk.setValue($(this).val());
+				$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+				$('#satk_RGB').css('background', 'rgb('+ {{poke_now.satk}} + ',' + satk.getValue()/2 + ',' + 0 + ')');
+    			$('#satk_RGB').css('width', ( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) ) + 'px');
+			});
+
+			$('#satkIV').on('input propertychange', function() { if ($(this).val()>31){$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+31)/2)+5)*satk_sub*satk_add) )}else{$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) )};
+    			$('#satk_RGB').css('width', ( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) ) + 'px');
+			});
+
+			var satk_RGBChange = function() {$('#satk_RGB').css('background', 'rgb('+ {{poke_now.satk}} + ',' + satk.getValue()/2 + ',' + 0 + ')')
+    								$('#satk_RGB').css('width', ( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) ) + 'px');
+    								$('#satkbase').val(satk.getValue());
+    								if ($('#satkIV').val()>31){$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+31)/2)+5)*satk_sub*satk_add) )}else{$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) )}; };
+			var satk = $('#satkex').slider().on('slide', satk_RGBChange).data('slider');
+
+		// sdef能力值计算
+			$("#sdefStat").text(parseInt(({{poke_now.sdef}}*2+31)/2)+5);
+			$('#sdef_RGB').css('width', (parseInt(({{poke_now.sdef}}*2+31)/2)+5) + 'px');
+			$('#sdef_RGB').css('background', 'rgb('+ {{poke_now.sdef}} + ',' + 0 + ',' + 0 + ')');
+
+			$('#sdefbase').on('input propertychange', function() {sdef.setValue($(this).val());
+				$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+				$('#sdef_RGB').css('background', 'rgb('+ {{poke_now.sdef}} + ',' + sdef.getValue()/2 + ',' + 0 + ')');
+    			$('#sdef_RGB').css('width', ( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) ) + 'px');
+			});
+
+			$('#sdefIV').on('input propertychange', function() { if ($(this).val()>31){$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+31)/2)+5)*sdef_sub*sdef_add) )}else{$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) )};
+    			$('#sdef_RGB').css('width', ( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) ) + 'px');
+			});
+
+			var sdef_RGBChange = function() {$('#sdef_RGB').css('background', 'rgb('+ {{poke_now.sdef}} + ',' + sdef.getValue()/2 + ',' + 0 + ')')
+    								$('#sdef_RGB').css('width', ( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) ) + 'px');
+    								$('#sdefbase').val(sdef.getValue());
+    								if ($('#sdefIV').val()>31){$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+31)/2)+5)*sdef_sub*sdef_add) )}else{$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) )}; };
+			var sdef = $('#sdefex').slider().on('slide', sdef_RGBChange).data('slider');
+
+		// sp能力值计算
+			$("#spStat").text(parseInt(({{poke_now.sp}}*2+31)/2)+5);
+			$('#sp_RGB').css('width', (parseInt(({{poke_now.sp}}*2+31)/2)+5) + 'px');
+			$('#sp_RGB').css('background', 'rgb('+ {{poke_now.sp}} + ',' + 0 + ',' + 0 + ')');
+
+			$('#spbase').on('input propertychange', function() {sp.setValue($(this).val());
+				$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+				$('#sp_RGB').css('background', 'rgb('+ {{poke_now.sp}} + ',' + sp.getValue()/2 + ',' + 0 + ')');
+    			$('#sp_RGB').css('width', ( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) ) + 'px');
+			});
+
+			$('#spIV').on('input propertychange', function() { if ($(this).val()>31){$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+31)/2)+5)*sp_sub*sp_add) )}else{$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) )};
+    			$('#sp_RGB').css('width', ( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) ) + 'px');
+			});
+
+			var sp_RGBChange = function() {$('#sp_RGB').css('background', 'rgb('+ {{poke_now.sp}} + ',' + sp.getValue()/2 + ',' + 0 + ')')
+    								$('#sp_RGB').css('width', ( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) ) + 'px');
+    								$('#spbase').val(sp.getValue());
+    								if ($('#spIV').val()>31){$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+31)/2)+5)*sp_sub*sp_add) )}else{$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) )}; };
+			var sp = $('#spex').slider().on('slide', sp_RGBChange).data('slider');
+
+		// 性格修正计算
+			var atk_add = 1; var atk_sub = 1;
+			var def_add = 1; var def_sub = 1;
+			var satk_add = 1; var satk_sub = 1;
+			var sdef_add = 1; var sdef_sub = 1;
+			var sp_add = 1; var sp_sub = 1;
+
+			$(".nature-").change(  
+		        function() {  
+		        var id = $("input[name='nature-']:checked").attr('id');  
+		        if (id == 'atk-') {
+		        	atk_sub = 0.9; atk_add = 1; def_sub = 1; satk_sub = 1; sdef_sub = 1; sp_sub = 1;
+		        	$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+		        	$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+		        	$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+		        	$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+		        else if (id == 'defen-'){
+		        	atk_sub = 1; def_add = 1; def_sub = 0.9; satk_sub = 1; sdef_sub = 1; sp_sub = 1;
+		        	$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+ 					$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+ 					$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+ 					$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+		        else if (id == 'satk-'){
+		        	atk_sub = 1; def_sub = 1; satk_sub = 0.9; satk_add = 1; sdef_sub = 1; sp_sub = 1;
+		        	$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+ 					$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+ 					$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+ 					$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+		        else if (id == 'sdef-'){
+		        	atk_sub = 1; def_sub = 1; satk_sub = 1; sdef_add = 1; sdef_sub = 0.9; sp_sub = 1;
+		        	$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+ 					$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+ 					$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+ 					$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+		        else if (id == 'sp-'){
+		        	atk_sub = 1; def_sub = 1; satk_sub = 1; sdef_sub = 1; sp_sub = 0.9; sp_add = 1;
+		        	$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+ 					$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+ 					$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+ 					$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+		    ;});
+
+		    $(".nature_add").change(  
+		        function() {  
+		        var id = $("input[name='nature_add']:checked").attr('id');  
+		        if (id == 'atk_add') {
+		        	atk_sub = 1; atk_add = 1.1; def_add = 1; satk_add = 1; sdef_add = 1; sp_add = 1;
+ 					$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+ 					$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+ 					$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+ 					$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+		        else if (id == 'defen_add'){
+		        	atk_add = 1; def_add = 1.1; def_sub = 1; satk_add = 1; sdef_add = 1; sp_add = 1;
+		        	$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+		        	$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+		        	$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+		        	$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+		        else if (id == 'satk_add'){
+		        	atk_add = 1; def_add = 1; satk_sub = 1; satk_add = 1.1; sdef_add = 1; sp_add = 1;
+		        	$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+		        	$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+		        	$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+		        	$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+		        else if (id == 'sdef_add'){
+		        	atk_add = 1; def_add = 1; satk_add = 1; sdef_add = 1.1; sdef_sub = 1; sp_add = 1;
+		        	$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+		        	$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+		        	$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+		        	$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+		        else if (id == 'sp_add'){
+		        	atk_add = 1; def_add = 1; satk_add = 1; sdef_add = 1; sp_sub = 1; sp_add = 1.1;
+		        	$('#atkStat').text( parseInt((parseInt(({{poke_now.atk}}*2+parseInt(atk.getValue()/4)+($('#atkIV').val()-0))/2)+5)*atk_sub*atk_add) );
+		        	$('#defenStat').text( parseInt((parseInt(({{poke_now.defen}}*2+parseInt(defen.getValue()/4)+($('#defenIV').val()-0))/2)+5)*def_sub*def_add) );
+		        	$('#satkStat').text( parseInt((parseInt(({{poke_now.satk}}*2+parseInt(satk.getValue()/4)+($('#satkIV').val()-0))/2)+5)*satk_sub*satk_add) );
+		        	$('#sdefStat').text( parseInt((parseInt(({{poke_now.sdef}}*2+parseInt(sdef.getValue()/4)+($('#sdefIV').val()-0))/2)+5)*sdef_sub*sdef_add) );
+		        	$('#spStat').text( parseInt((parseInt(({{poke_now.sp}}*2+parseInt(sp.getValue()/4)+($('#spIV').val()-0))/2)+5)*sp_sub*sp_add) );
+		        }
+
+		    ;});
+
+
+
+		// $(".panel-heading").on("mouseover","a", function(){ //鼠标悬停手风琴切换
+  //   	$(this).click();
+  //     	});
+
+    </script>
+
+  </body>
+</html>

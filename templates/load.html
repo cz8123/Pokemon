@@ -1,0 +1,10 @@
+{% for poke in ranklist %}
+<div class="img-wrap">
+	<div class="img-wrap1"><p><span class="label label-danger">{{poke.rank}}</span>&nbsp;&nbsp;<b>{{poke.name}}</b></p></div>
+	<div class="img-wrap2">
+		<a id="{{id}}" data="{{poke.id}}" name="{{poke.name}}" href="#type-chart" role="button" data-toggle="modal">
+			<img src="/static/poke/img/pgl/{{poke.id}}.png" class="img-thumbnail">
+		</a>
+	</div>
+</div>
+{% endfor %}

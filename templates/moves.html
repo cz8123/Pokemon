@@ -1,0 +1,149 @@
+{% load staticfiles %}
+{% load move_tags %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>Pokemon-Moves</title>
+
+    <!-- Bootstrap -->
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'poke/css/select2.css' %}" rel="stylesheet">
+    <link href="{% static 'poke/css/bootstrap-slider.css' %}" rel="stylesheet" /> <!-- 滑动条 -->
+    <link href="{% static 'poke/css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'poke/css/my.css' %}" rel="stylesheet"> <!-- 后面覆盖前面 -->
+
+  </head> 
+  <body>
+  	<div class="container">
+
+		<div class="row clearfix"><h3><b>{{move.name}}</b>&emsp;&emsp;<a href="{% url 'poke:pokepost' %}" target="_blank">首页</a>&emsp;&emsp;<a href="{% url 'poke:pgl' %}" target="_blank">pgl-rank</a></h3></div>
+		<hr />
+
+		<div class="row clearfix">
+			<table class="table table-condensed">
+				<thead>
+				    <tr>
+				      <th></th>
+				      <th>招式</th>
+				      <th></th>
+				      <th>属性</th>
+				      <th>类型</th>
+				      <th>威力</th>
+				      <th>z</th>
+				      <th>命中</th>
+				      <th>先制</th>
+				      <th>说明</th>
+				      <th>神百</th>
+				    </tr>
+				</thead>
+				<tbody>
+				    <tr>
+				      <td style="width:10px;"><a href="{% url 'poke:moves' move_prev.id %}" role="button" class="btn"><<</a></td>
+				      <td>
+				      	<form id="movesform" class="bs-example bs-example-form" role="form" action="{% url 'poke:movepost' move.id %}" method="post">
+							{% csrf_token %}
+							<select onchange="submitForm();" name="movepost" id="moveselect" style="width:110px">
+								{% get_moves as moves %}
+								{% for m in moves %}
+								<option value="{{m.id}}">{{m.name}}</option>
+								{% endfor %}
+							</select>
+						</form>
+				      </td>
+				      <td style="width:10px;"><a href="{% url 'poke:moves' move_next.id %}" role="button" class="btn">>></a></td>
+				      <td><h4><span id="types" class="label label-default" style="width:60px; background-color:{{move.types.color}};">{{move.types.name}}</span></h4></td>
+				      <td><h4><span id="cate" class="label label-default" style="width:60px; background-color:{{move.cate.color}};">{{move.cate.name}}</span></h4></td>
+				      <td id="power" style="width:60px;">{{move.power}}</td>
+				      <td id="z_power" style="width:60px;">{{move.z_power}}</td>
+				      <td id="accuracy" style="width:60px;">{{move.accuracy}}</td>
+				      <td id="priority" style="width:60px;">{{move.priority}}</td>
+				      <td id="detail" style="width:700px;">{{move.detail}}</td>
+				      <td  style="width:60px;"><a href="https://wiki.52poke.com/wiki/{{move.name}}" id="link" target="_blank">详情</a></td>
+				    </tr>
+				</tbody>
+			</table>
+		</div>
+		<hr />
+		<div class="row clearfix">
+			{% for p in move.id|get_detail %}
+			<p>{{p}}</p>
+			{% endfor %}
+		</div>
+		<hr />
+		<div class="row clearfix">
+
+			<div class="col-md-1"><b>作用范围</b></div>
+			<div class="col-md-4">{{move.move_range.name}}</div>
+			<div class="col-md-4">
+				<div class="row">
+					<div class="btn-group">
+		              <button type="button" class="btn btn-default" style="background-color: {{move.move_range.d1}};">对手</button>
+		              <button type="button" class="btn btn-default" style="background-color: {{move.move_range.d2}};">对手</button>
+		              <button type="button" class="btn btn-default" style="background-color: {{move.move_range.d3}};">对手</button>
+		            </div>
+		        </div>
+		        <div class="row">
+		            <div class="btn-group">
+		              <button type="button" class="btn btn-default" style="background-color: {{move.move_range.z}};">自身</button>
+		              <button type="button" class="btn btn-default" style="background-color: {{move.move_range.t1}};">同伴</button>
+		              <button type="button" class="btn btn-default" style="background-color: {{move.move_range.t2}};">同伴</button>
+		            </div>
+	            </div>
+			</div>
+			<div class="col-md-2">
+				<div class="panel panel-default">  
+		  			<div class="panel-body">  
+		  				<div class="row">
+		  					<div class="col-md-4">
+								<button id="b1" class="btn btn-default btn-sm" type="button" value="{{move.types.name}},{{move.cate.name}}">计算</button>
+		  					</div>
+		  				</div>
+		  				<hr />
+		  				<div class="row" id="display"></div>
+				  	</div>  
+				</div>
+			</div>
+		</div>
+	</div><!-- container -->
+
+		  	
+
+	
+
+	<!-- JavaScript 放置在文档最后面可以使页面加载速度更快 -->
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在其他js前边) -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="{% static 'poke/js/ajax.js' %}"></script>
+    <!-- <script src="{% static 'poke/js/bootstrap-slider.min.js' %}"></script> -->
+    <script src="{% static 'poke/js/select2.js' %}"></script>
+    <script type="text/javascript">
+
+		$(function(){ 
+	        	$("#moveselect option[value='{{move.id}}']").attr("selected","selected");
+	        	$("#moveselect").select2();
+	      	});
+
+		function submitForm(){var form = document.getElementById("movesform");form.submit();};
+
+		// 计算技能
+    	$("#b1").click(function(){
+    		$.ajax({
+			    url: "{% url 'poke:movepost' %}",
+			    data: { s1: [$(this).val().split(',')[0], $(this).val().split(',')[1]],
+					},
+			    type: "POST",
+			    success: function(data) { 
+			    	$('#display').html(data);
+			    } 
+			});
+		});
+    </script>
+
+  </body>
+</html>
