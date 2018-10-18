@@ -5,6 +5,7 @@ from django.forms.models import model_to_dict # 将QuerySet对象转换成字典
 from collections import OrderedDict
 import json, MySQLdb, requests, time, subprocess
 from django.urls import reverse
+from json.decoder import JSONDecodeError
 
 class PokeDetailView(DetailView):
 	queryset = Pokemon.objects.all()
@@ -142,9 +143,12 @@ def check_update(s): # 检查赛季数据是否更新
 	'timeStamp': str(int(time.time())),
 	}
 	r = requests.post(url, data=form_data, headers=headers).text
-	if json.loads(r)['status_code'] == '0000':
-		return json.loads(r)['updateDate']
-	else:
+	try:
+		if json.loads(r)['status_code'] == '0000':
+			return json.loads(r)['updateDate']
+		else:
+			return False
+	except JSONDecodeError:
 		return False
 
 def allpokelist(): # 从数据库获取所有pokemon列表
@@ -218,23 +222,31 @@ def mysql2dict2(s, n, id_):
 		r['pokeInfo1'] = pokeInfo1
 	return r
 
-def pgl(request, s='311'):
+def pgl(request, s='312'):
 	if request.method == 'GET':
 		seasonid = request.GET.get('season', s)
 		rank_list1, updateDate = ranklist(seasonid, '1', 31)
 		rank_list2, _ = ranklist(seasonid, '2', 31)
 		rank_list5, _ = ranklist(seasonid, '5', 31)
 		rank_list6, _ = ranklist(seasonid, '6', 31)
-		update = check_update(seasonid)
+		update = check_update(seasonid) if int(seasonid) >= 312 else None
 		is_updated = False
 		if update and (update != updateDate):
 			is_updated = True
 		s = {
+				'312': 'Season 12　09/04/18 09:00 AM - 11/06/18 08:59 AM JST　09/04/18 12:00 AM - 11/05/18 11:59 PM UTC',
 				'311': 'Season 11　07/10/18 09:00 AM - 09/04/18 08:59 AM JST　07/10/18 12:00 AM - 09/03/18 11:59 PM UTC',
 				'310': 'Season 10　05/15/18 09:00 AM - 07/10/18 08:59 AM JST　05/15/18 12:00 AM - 07/09/18 11:59 PM UTC',
 				'309': 'Season 9　03/13/18 09:00 AM - 05/15/18 08:59 AM JST　03/13/18 12:00 AM - 05/14/18 11:59 PM UTC',
 				'308': 'Season 8　01/23/18 09:00 AM - 03/13/18 08:59 AM JST　01/23/18 12:00 AM - 03/12/18 11:59 PM UTC'
 			}
+		detail = {
+			'312': 'Wcs神战模式，无z，无mega，无宝玉，无画龙点睛',
+			'311': 'Special模式，幻兽63单打',
+			'310': 'Special模式，反转属性64双打',
+			# '309': 'Season 9　03/13/18 09:00 AM - 05/15/18 08:59 AM JST　03/13/18 12:00 AM - 05/14/18 11:59 PM UTC',
+			'308': 'Special模式，神战64双打'
+		}
 		context={
 			'rank_list1': rank_list1,
 			'rank_list2': rank_list2,
@@ -244,8 +256,10 @@ def pgl(request, s='311'):
 			'is_updated': is_updated,
 			'seasonid': seasonid,
 			's': s[seasonid],
+			'detail': detail[seasonid],
 		}
-		template = 'pglseason%s.html'%seasonid
+		# template = 'pglseason%s.html'%seasonid
+		template = 'pglseason.html'
 
 	if request.method == 'POST':
 		if request.POST.get('load', False):
@@ -286,7 +300,7 @@ def pgl(request, s='311'):
 				type_ = 'Wcs'
 			else:
 				type_ = 'Special'
-			s1 = {'311': 'Season 11', '310': 'Season 10', '309': 'Season 9', '308': 'Season 8'}
+			s1 = {'312': 'Season 12', '311': 'Season 11', '310': 'Season 10', '309': 'Season 9', '308': 'Season 8'}
 			context = {
 				'p_id': p_id,
 				'item_dict': r.get('item_dict', None),
