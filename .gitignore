@@ -5,8 +5,8 @@ __pycache__/
 /static
 /poke/migrations/
 /poke/static/poke/img/
-/pokemon/local_settings.py
-/poke_spider
+# /pokemon/local_settings.py
+# /poke_spider
 # C extensions
 *.so
 *.xls
