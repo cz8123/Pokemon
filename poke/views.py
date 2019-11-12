@@ -222,29 +222,27 @@ def mysql2dict2(s, n, id_):
 		r['pokeInfo1'] = pokeInfo1
 	return r
 
-def pgl(request, s='315'):
+def pgl(request, s='317'):
 	if request.method == 'GET':
 		seasonid = request.GET.get('season', s)
 		rank_list1, updateDate = ranklist(seasonid, '1', 31)
 		rank_list2, _ = ranklist(seasonid, '2', 31)
 		rank_list5, _ = ranklist(seasonid, '5', 31)
 		rank_list6, _ = ranklist(seasonid, '6', 31)
-		update = check_update(seasonid) if int(seasonid) >= 315 else None
+		update = check_update(seasonid) if int(seasonid) >= 317 else None
 		is_updated = False
 		if update and (update != updateDate):
 			is_updated = True
 		s = {	
+				'317': 'Season 17　09/03/19 09:00 AM - 11/26/19 08:59 AM JST　09/03/19 12:00 AM - 11/25/19 11:59 PM UTC',
 				'315': 'Season 15　04/02/19 09:00 AM - 06/18/19 08:59 AM JST　04/02/19 12:00 AM - 06/17/19 11:59 PM UTC',
-				'314': 'Season 14　11/06/18 09:00 AM - 01/08/19 08:59 AM JST　11/06/18 12:00 AM - 01/07/19 11:59 PM UTC',
 				'313': 'Season 13　11/06/18 09:00 AM - 01/08/19 08:59 AM JST　11/06/18 12:00 AM - 01/07/19 11:59 PM UTC',
-				'312': 'Season 12　09/04/18 09:00 AM - 11/06/18 08:59 AM JST　09/04/18 12:00 AM - 11/05/18 11:59 PM UTC',
 				'311': 'Season 11　07/10/18 09:00 AM - 09/04/18 08:59 AM JST　07/10/18 12:00 AM - 09/03/18 11:59 PM UTC',
 			}
 		detail = {
-			'315': 'Special: 摇手指大赛；Wcs：神战64双打（无z、mega、宝玉、画龙点睛）',
-			'314': 'Wcs：神战64双打（无z、mega、宝玉、画龙点睛）',
+			'317': 'Wcs：神战64双打；Special: 一级对战',
+			'315': 'Special: 摇手指大赛；Wcs：神战64双打',
 			'313': 'Special：神战64双打（仅限一二级神）；Wcs：神战64双打（无z、mega、宝玉、画龙点睛）',
-			'312': 'Wcs：神战64双打（无z、mega、宝玉、画龙点睛）',
 			'311': 'Special：幻兽63单打',
 		}
 		context={
@@ -300,7 +298,7 @@ def pgl(request, s='315'):
 				type_ = 'Wcs'
 			else:
 				type_ = 'Special'
-			s1 = {'313': 'Season 13', '312': 'Season 12', '311': 'Season 11', '314': 'Season 14', '315': 'Season 15'}
+			s1 = {'313': 'Season 13', '312': 'Season 12', '311': 'Season 11', '317': 'Season 17', '315': 'Season 15'}
 			context = {
 				'p_id': p_id,
 				'item_dict': r.get('item_dict', None),
